@@ -7,8 +7,29 @@ node {
    git 'https://github.com/devops311/terraform-configuration.git'
   }
   
-def project_terra="terraform/"
-dir(project_terra) {
+def project_path="terraform"
+ 
+ dir(project_path) {
+ stage('Creating a folder to store artifacts'){
+    sh label: '',script: "mkdir -p warstorageprod"
+    
+    }
+    
+ stage(' Downloading Jar From Artifactory Locally'){
+    def server= Artifactory.server 'Artifactory'
+    def downloadSpec = """{
+    "files": [
+    {
+      "pattern": "userproject/*.war",
+      "target": "/root/.jenkins/workspace/terraform-deployment-role/terraform/warstorageprod/"
+      
+    }
+    ]
+    }"""
+    server.download(downloadSpec)
+   
+}
+   
    stage('Creating Prod Deployment Instance on AWS'){
    sh label: 'terraform', script: '/bin/terraform  init'
    sh label: 'terraform', script: '/bin/terraform  apply -input=false -auto-approve'
