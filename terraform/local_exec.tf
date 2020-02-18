@@ -33,5 +33,15 @@ resource "null_resource" "remote-exec-1" {
     ]
   }
 }
-
+resource "null_resource" "ansible-main" {
+provisioner "local-exec" {
+  command = <<EOT
+        sleep 100;
+        > jenkins-ci.ini;
+        echo "[jenkins-ci]"| tee -a jenkins-ci.ini;
+        export ANSIBLE_HOST_KEY_CHECKING=False;
+        echo "${aws_instance.backend.public_ip}" | tee -a jenkins-ci.ini;
+    EOT
+}
+}
 
